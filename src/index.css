@@ -1,13 +1,33 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  background-color: #030c1d;
+  font-family: Inter !important;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  background: url('./assets/png/admin-background.png');
+  background-size: cover;
+  margin: 0;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0
+}
+
+a, a:link, a:visited {
+  text-decoration: none !important;
+}
+
+a.link, .link, a.link:link, .link:link, a.link:visited, .link:visited {
+  color: #344767 !important;
+  transition: color 150ms ease-in !important
+}
+
+a.link:hover, .link:hover, a.link:focus, .link:focus {
+  color: #0075ff !important
 }
