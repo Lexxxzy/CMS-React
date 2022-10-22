@@ -6,9 +6,14 @@ module.exports = {
     'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'Inter': ['Inter', 'sans-serif'] 
+      },
+    },
     fontSize: {
       xs: '11px',
+      lg: "1.125rem",
       'xl': '1.3rem'
     }
   },

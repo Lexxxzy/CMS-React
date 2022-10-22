@@ -2,10 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url(//fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap);
+
 html {
   scroll-behavior: smooth;
   background-color: #030c1d;
-  font-family: Inter !important;
+  font-family: 'Inter', sans-serif, !important;
 }
 
 body {
