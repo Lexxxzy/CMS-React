@@ -5,6 +5,7 @@ import Icon from "../../components/Icon";
 import Dropdown from "../../components/Dropdown";
 import Table from "../Table/table.component";
 import ExployeeTable from "../Tables/employee.component";
+import AnalyticsDashboard from "../Analytics/analytics.component";
 
 const items = [
   {
@@ -136,7 +137,7 @@ const SideMenu = () => {
           </div>
         </div>
         <div className="w-full pr-32">
-          {activeTab === options[0] &&  <div/>}
+          {activeTab === options[0] && <AnalyticsDashboard title={activeTab}/>}
           {activeTab === options[1] && <Table title={activeTab}/>}
           {activeTab === options[2] &&  <Table title={activeTab}/>}
           {activeTab === options[3] &&  <Table title={activeTab}/>}

@@ -9,6 +9,12 @@ const icons = {
   profile: "svg/Profile.svg",
   signout: "svg/SignOut.svg",
   tasks: "svg/Tasks.svg",
+  more: "svg/more.svg",
+  question: "svg/Question.svg",
+  success: "svg/Success.svg",
+  "employee-blue": "svg/Employees-blue.svg",
+  card: "svg/Card.svg",
+  cross: "svg/cross.svg"
   };
 
 const Icon = (props) => {
