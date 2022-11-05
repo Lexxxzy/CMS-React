@@ -6,6 +6,8 @@ import Dropdown from "../../components/Dropdown";
 import Table from "../Table/table.component";
 import ExployeeTable from "../Tables/employee.component";
 import AnalyticsDashboard from "../Analytics/analytics.component";
+import Profile from "../Profile/profile.component";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const items = [
   {
@@ -79,13 +81,19 @@ const dataEmployees = [
 const SideMenu = () => {
   const options = [];
 
-  items.map((subarray) =>(//this block will map  [2,7], [13, 47], [55,77] as in their own arrays individually?
+  items.map((subarray) =>(
     subarray.titles.map((subtitle) => (options.push(subtitle.title)))
   )
   )
 
   const [activeTab, setActiveTab] = useState(options[0]);
 
+  const navigate = useNavigate()
+
+  const signOut = () => {
+    navigate("/login")
+  }
+  
   const handleClick = (x) => {
     setActiveTab(x.title);
   };
@@ -139,9 +147,11 @@ const SideMenu = () => {
         <div className="w-full pr-32">
           {activeTab === options[0] && <AnalyticsDashboard title={activeTab}/>}
           {activeTab === options[1] && <Table title={activeTab}/>}
-          {activeTab === options[2] &&  <Table title={activeTab}/>}
-          {activeTab === options[3] &&  <Table title={activeTab}/>}
+          {activeTab === options[2] && <Table title={activeTab}/>}
+          {activeTab === options[3] && <Table title={activeTab}/>}
           {activeTab === options[4] && <ExployeeTable title={activeTab} rows={dataEmployees}/>}
+          {activeTab === options[5] && <Profile title={activeTab}/>}
+          {activeTab === options[6] && <Navigate to="/login"/>}
         </div>
       </div>
     </div>

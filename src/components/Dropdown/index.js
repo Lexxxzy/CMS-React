@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import cn from "classnames";
 import styles from "./Dropdown.module.sass";
 import Icon from "../Icon";
+import OutsideClickHandler from "react-outside-click-handler";
 
 const Dropdown = ({ className, value, setValue, options, empty }) => {
   const [visible, setVisible] = useState(false);
@@ -12,18 +13,19 @@ const Dropdown = ({ className, value, setValue, options, empty }) => {
   };
 
   return (
+    <OutsideClickHandler onOutsideClick={() => setVisible(false)}>
       <div
         className={cn(styles.dropdown, { [styles.empty]: empty }, className, {
           [styles.active]: visible,
         })}
       >
-        <div className={styles.head} onClick={() => setVisible(!visible)}>
+        <div className={cn(styles.head, 'bg-slate-800/50')} onClick={() => setVisible(!visible)}>
           <div className={styles.selection}>{value}</div>
           <div className={styles.arrow}>
-            <Icon name="arrow-bottom" size="10" />
+            <Icon name="arrow" size="10" />
           </div>
         </div>
-        <div className={styles.body}>
+        <div className={cn(styles.body, 'bg-gray-900/90 backdrop-blur-sm')}>
           {options.map((x, index) => (
             <div
               className={cn(styles.option, {
@@ -37,6 +39,7 @@ const Dropdown = ({ className, value, setValue, options, empty }) => {
           ))}
         </div>
       </div>
+      </OutsideClickHandler>
   );
 };
 

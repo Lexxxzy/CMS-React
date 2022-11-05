@@ -14,7 +14,8 @@ const icons = {
   success: "svg/Success.svg",
   "employee-blue": "svg/Employees-blue.svg",
   card: "svg/Card.svg",
-  cross: "svg/cross.svg"
+  cross: "svg/cross.svg",
+  arrow: "svg/Arrow-down.svg"
   };
 
 const Icon = (props) => {
