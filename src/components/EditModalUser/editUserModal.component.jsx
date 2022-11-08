@@ -38,7 +38,7 @@ function EditUserModal(props) {
                 More Info
             </Button>
             <Modal
-            
+                
                 show={visible}
                 onClose={() => setVisible(false)}
             >

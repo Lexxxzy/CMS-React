@@ -11,9 +11,11 @@ html {
 }
 
 body {
-  background: url('./assets/png/admin-background.png');
+  background-color: #0a101a;
+  background: url('./assets/png/admin-background.png') no-repeat scroll -5px 1px;
   background-size: cover;
   margin: 0;
+  z-index:1; 
 }
 
 *, *::before, *::after {

@@ -4,10 +4,13 @@ import styles from "./sideMenu.styles.sass";
 import Icon from "../../components/Icon";
 import Dropdown from "../../components/Dropdown";
 import Table from "../Table/table.component";
-import ExployeeTable from "../Tables/employee.component";
+import EmployeeTable from "../Tables/employee.component";
 import AnalyticsDashboard from "../Analytics/analytics.component";
 import Profile from "../Profile/profile.component";
 import { Navigate, useNavigate } from "react-router-dom";
+import CustomersTable from "../Tables/customers.component";
+import RepresentativesTable from "../Tables/representatives.component";
+import Kanban from "../Kanban/kanban.component";
 
 const items = [
   {
@@ -23,6 +26,10 @@ const items = [
       },
       {
         title: "Customers",
+        icon: "cusomers",
+      },
+      {
+        title: "Representatives",
         icon: "cusomers",
       },
       {
@@ -75,6 +82,36 @@ const dataEmployees = [
   }
 ]
 
+const dataCustomers = [
+  {
+    "tax id" : "1458992782",
+    "title" : "LackOn"	,
+    "email" : "lackon@mail.ru",
+    "payment account" : 50788216500000008245,
+    "phone" : "84998996899",
+    "client" : "true",
+    "postal code" : "302457",
+    "city" : "Дорохово",
+    "address" : "шоссе Чехова, 36",
+    "map" : "(-26.116548,-88.028458)",
+    "representative" : "Смирнов Г.A."
+  },
+]
+
+const dataRepresentatives = [
+  {
+    name: "Aнна",
+    "middle name": "Алексеевна",
+    surname: "Дубкова",
+    tin: "150342858572",
+    position: "Менеджер",
+    email: "dubkova@wma.ru",
+    phone: "89819261572",
+    "internal phone": "343432432534",
+    organization: "LackOn",
+    age: "34"
+  }
+]
 
 
 
@@ -93,10 +130,12 @@ const SideMenu = () => {
   const signOut = () => {
     navigate("/login")
   }
-  
+
   const handleClick = (x) => {
     setActiveTab(x.title);
   };
+
+  
 
   return (
 
@@ -110,7 +149,7 @@ const SideMenu = () => {
           setValue={setActiveTab}
         />
 
-        <div className="border-solid border border-slate-300/10 hover:border-slate-50/10 bg-gray-900/60 ackdrop-blur-sm w-72 flex flex-col shrink-0 items-start justify-between p-12 pb-0 pr-8 rounded-3xl mr-36">
+        <div className="border-solid border border-slate-300/10 hover:border-slate-50/10 bg-gray-900/60 backdrop-blur-sm w-72 flex flex-col shrink-0 items-start justify-between p-12 pb-0 pr-8 rounded-3xl mr-36">
           <div className="font-bold m-auto pb-6 text-center tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-slate-300 to-gray-900">
             ADMIN PANEL
           </div>
@@ -146,12 +185,13 @@ const SideMenu = () => {
         </div>
         <div className="w-full pr-32">
           {activeTab === options[0] && <AnalyticsDashboard title={activeTab}/>}
-          {activeTab === options[1] && <Table title={activeTab}/>}
-          {activeTab === options[2] && <Table title={activeTab}/>}
-          {activeTab === options[3] && <Table title={activeTab}/>}
-          {activeTab === options[4] && <ExployeeTable title={activeTab} rows={dataEmployees}/>}
-          {activeTab === options[5] && <Profile title={activeTab}/>}
-          {activeTab === options[6] && <Navigate to="/login"/>}
+          {activeTab === options[1] && <Kanban title={activeTab}/>}
+          {activeTab === options[2] && <CustomersTable title={activeTab} rows={dataCustomers}/>}
+          {activeTab === options[3] && <RepresentativesTable title={activeTab} rows={dataRepresentatives}/>}
+          {activeTab === options[4] && <Table title={activeTab} />}
+          {activeTab === options[5] && <EmployeeTable title={activeTab} rows={dataEmployees}/>}
+          {activeTab === options[6] && <Profile title={activeTab}/>}
+          {activeTab === options[7] && <Navigate to="/login"/>}
         </div>
       </div>
     </div>
