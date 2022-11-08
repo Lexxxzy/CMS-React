@@ -1,5 +1,5 @@
 import React from 'react'
-import EditUserModal from '../EditModalUser/editUserModal.component'
+import EditModal from '../EditModalUser/editUserModal.component'
 import Table from '../Table/table.component'
 import cn from "classnames"
 
@@ -61,7 +61,7 @@ export default function CustomersTable(props) {
                                                    info["client"] === "true" ? 'text-green-400' : 'text-red-500')}>{info["client"] === "true" ? 'Yes' : 'Not'}</td>
                                 <td className="py-4 px-6 font-semibold text-white">{info["city"]}</td>
                                 <td className="py-4 px-6">
-                                    <EditUserModal fields={Object.keys(info)} data={rows[index]} title={title}/>
+                                    <EditModal fields={Object.keys(info)} data={rows[index]} title={title}/>
                                 </td>
                                 
                             </tr>

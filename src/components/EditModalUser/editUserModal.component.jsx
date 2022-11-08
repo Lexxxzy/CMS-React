@@ -2,9 +2,9 @@ import React, { useEffect} from 'react';
 import { Button, Modal } from 'flowbite-react';
 import OutsideClickHandler from "react-outside-click-handler";
     
-function EditUserModal(props) {
+function EditModal(props) {
     const [visible, setVisible] = React.useState(false);
-    const { fields, data, title } = props
+    const { fields, data, title, buttonText="More Info" } = props
 
     useEffect(() => {
         const firstField = document.querySelector("input[name=field-0]")
@@ -35,7 +35,7 @@ function EditUserModal(props) {
         
         <React.Fragment>
             <Button onClick={() => setVisible(true)} color="transparent">
-                More Info
+                {buttonText}
             </Button>
             <Modal
                 
@@ -46,7 +46,7 @@ function EditUserModal(props) {
                 <div className="bg-slate-900/10">
 
                     <Modal.Header>
-                        Edit {title.slice(0, title.length-1)}
+                        {title.slice(0, title.length-1)}
 
                     </Modal.Header>
                     <Modal.Body>
@@ -93,4 +93,4 @@ function EditUserModal(props) {
     );
 }
 
-export default EditUserModal;
+export default EditModal;

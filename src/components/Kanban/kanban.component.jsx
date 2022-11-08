@@ -4,7 +4,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import Card from './Card/card.component'
 import './kanban.styles.sass'
 import cn from "classnames"
-import EditUserModal from '../EditModalUser/editUserModal.component'
+import EditModal from '../EditModalUser/editUserModal.component'
 import { Button } from 'flowbite-react'
 
 const mockData= [
@@ -65,6 +65,9 @@ const mockData= [
     ]
   }
 ]
+
+const taskRows = ["Task title","Deadline","Representative","Executor","Contract","Priority"];
+
 function Kanban({ title }) {
   const [data, setData] = useState(mockData)
 
@@ -122,7 +125,7 @@ function Kanban({ title }) {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className='p-10 bg-slate-900/20 rounded-2xl first:mr-20 h-fit w-1/2 border-slate-300/10 border-solid border'
+                          className='mb-10 p-10 bg-slate-900/20 rounded-2xl first:mr-20 h-fit w-1/2 border-slate-300/10 border-solid border'
                         >
                           <div className ='text-white font-bold text-xl p-4 text-left mb-5'>
                             <h3 className=''>
@@ -161,11 +164,9 @@ function Kanban({ title }) {
                                 </Draggable>
                               ))}
                           </div>
-                          <Button color="transparent">
-                          <span className='text-slate-500 underline'>
-                            Add task
-                            </span>
-                            </Button>
+                          <div className='text-slate-500 underline '>
+                          <EditModal fields={taskRows} data={[]} title="Add taskk" buttonText="Add task"/>
+                          </div>
                           {provided.placeholder}
                         </div>
                       )}
