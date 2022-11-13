@@ -7,6 +7,9 @@ from sqlalchemy import text
 
 
 def check_mail(email):
+    if any(char=="'" or char=="*" for char in email):
+        return False
+    
     return validate(
         email_address=email,
         check_format=True,
@@ -85,11 +88,14 @@ def validate_passport(passport_id, issue_date, passport_name, passport_surname, 
 
 def validate_input(*args):
     SQL_CODES = ['SELECT', 'UPDATE', 'DELETE', 'INSERT',
-                 'CREATE', 'ALTER', 'DROP', 'INDEX', 'AND']
+                 'CREATE', 'ALTER', 'DROP', 'INDEX', 'AND', 'OR',
+                 'select', 'update', 'delete', 'insert',
+                 'create', 'alter', 'drop', 'index', 'and', 'or']
     SYMBOLS = ["'", "-", "*", '=', "&", "|",
                "{", "}", "@", "#", "%", "$", "(", ")", "_", ";", ":"]
 
     for value in args:
+        print(value)
         if any(char in SYMBOLS for char in value):
             return 'Invalid value'
 
@@ -116,6 +122,17 @@ def validate_login(login):
 
     return "ALL_VALID"
 
+def validate_name(*args):
+    for value in args:
+        validation_input = validate_input(value)
+        
+        if validation_input != "ALL_VALID":
+            return 'Invalid value in name'
+        
+        if not value.isalpha():
+            return 'Invalid value in name'
+        
+    return "ALL_VALID"
 
 def check_user_exists(login, email):
     with db.engine.connect() as connection:
@@ -127,6 +144,25 @@ def check_user_exists(login, email):
         res = [dict(row) for row in search_result]
 
         if (len(res) != 0):
-            return {"error": "User already exists"}
+            return "User already exists"
 
         return "ALL_VALID"
+
+def validate_role(role):
+    if role == "Сотрудник":
+        return "employee"
+    elif role == "Менеджер":
+        return "manager"
+    elif role == "Админ":
+        return "db_admin"
+    else:
+        return "Invalid value"
+    
+def validate_documents(tin, passport_id):
+    if len(tin) != 12 or not tin.isdigit():
+        return "Invalid TIN value"
+    
+    if len(passport_id) != 10 or not passport_id.isdigit():
+        return "Invalid passport id value"
+    
+    return "ALL_VALID"
