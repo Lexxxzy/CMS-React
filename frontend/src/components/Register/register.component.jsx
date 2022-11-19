@@ -50,7 +50,7 @@ export default function Register() {
 
     return (
         <div className='flex flex-col h-screen justify-center min-w-fit'>
-            <div className='m-auto pb-40 w-1/4'>
+            <div className={`m-auto pb-40 ${firstStep ? 'w-1/6' : 'w-1/4'}`}>
 
                 <h2 className='text-gray-50 text-2xl font-extrabold'>Sign Up</h2>
 

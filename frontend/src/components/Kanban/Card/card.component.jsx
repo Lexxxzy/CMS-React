@@ -10,7 +10,7 @@ function Card({ task }) {
                 <h3 className='leading-4'>
                     {title.slice(0, 20)} {title.length > 17 && "..."}
                     <button className={cn("absolute  ml-3 w-4 h-4 rounded-full bg-transparent border-4 border-solid  text-white",
-                        priority === 0 && "border-green-400", priority === 1 && "border-red-500", priority === 2 && "border-orange-400")} />
+                        priority === "0" && "border-green-400", (priority === "1" || priority === "010") && "border-orange-400", priority === 2 && "border-red-500")} />
                 </h3>
                 <div className='mt-1 pt-0'>
                     <span className='text-green-400/75 text-xs font-medium'>
@@ -39,7 +39,7 @@ function Card({ task }) {
 
                     <div className='w-2/5 pl-5'>
                         <h5>Contract</h5>
-                        <div className='text-m text-slate-400 font-medium'>{contract}</div>
+                        <div className='text-m text-slate-400 font-medium'>{contract===null ? "No" : `#${contract}`}</div>
                     </div>
                 </div>
             </div>

@@ -85,7 +85,7 @@ def register_user():
 
     if validation != "ALL_VALID":
         return jsonify({"error": validation}), 400
-    
+
     hashed_password = hash_password(password)
 
     try:
@@ -98,7 +98,7 @@ def register_user():
                                                     VALUES ('{name}','{surname}','{middle_name}','{position}','{email}','{tin}','{passport}','{login}','{password}',NULL,NULL);
                                                     '''.format(login=login, email=email, role=role, name=name, surname=surname, middle_name=middle_name, tin=tin, passport=passport, password=hashed_password, position=position)))
             session["user_id"] = login
-            print(create_user)
+
     except Exception:
         return jsonify({"error": "Some error occured"}), 500
 
@@ -114,21 +114,27 @@ def login_user():
         password = request.json["password"]
     except KeyError:
         return jsonify({"error": 'All fields must be filled'})
-    
+
     validation = check_mail(email)
-    
+
     if not validation:
         return jsonify({"error": "Invalid input"})
-    
+
     validation = check_password_hash(password, get_user_password(email))
-    
-    if(validation != 'ALL_VALID'):
+
+    if (validation != 'ALL_VALID'):
         return jsonify({"error": validation})
-    
+
     session["user_id"] = get_user_login(email)
-    print(session)
-    return {"email": email}
     
+    return {"email": email}
+
+
+@auth.route("/logout", methods=["POST"])
+def logout_user():
+    session.pop("user_id")
+    return "200"
+
 
 @auth.route("/@me")
 def get_user():

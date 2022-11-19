@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import cn from "classnames";
 import styles from "./sideMenu.styles.sass";
 import Icon from "../../components/Icon";
@@ -11,51 +11,9 @@ import { Navigate, useNavigate } from "react-router-dom";
 import CustomersTable from "../Tables/customers.component";
 import RepresentativesTable from "../Tables/representatives.component";
 import Kanban from "../Kanban/kanban.component";
-
-const items = [
-  {
-    sub: "tables",
-    "titles": [
-      {
-        title: "Analytics",
-        icon: "home",
-      },
-      {
-        title: "Tasks",
-        icon: "tasks",
-      },
-      {
-        title: "Customers",
-        icon: "cusomers",
-      },
-      {
-        title: "Representatives",
-        icon: "cusomers",
-      },
-      {
-        title: "Contracts",
-        icon: "contracts",
-      },
-      {
-        title: "Employees",
-        icon: "employees",
-      }
-    ],
-  },
-  {
-    sub: "account",
-    "titles": [
-      {
-        title: "Profile",
-        icon: "profile",
-      },
-      {
-        title: "Sign Out",
-        icon: "signout",
-      },
-    ],
-  }
-]
+import { useDispatch, useSelector } from "react-redux";
+import { getTables } from "../../calls/authCalls";
+import Loader from "../Loader";
 
 const dataEmployees = [
   {
@@ -116,15 +74,16 @@ const dataRepresentatives = [
 
 
 const SideMenu = () => {
+  const dispatchAction = useDispatch();
+  const { availibleTables, pending, error } = useSelector((state) => state.user);
+
   const options = [];
-
-  items.map((subarray) =>(
+  availibleTables.map((subarray) =>(
     subarray.titles.map((subtitle) => (options.push(subtitle.title)))
-  )
-  )
-
-  const [activeTab, setActiveTab] = useState(options[0]);
-
+  ))
+  
+  var [activeTab, setActiveTab] = useState("Tasks");
+  
   const navigate = useNavigate()
 
   const signOut = () => {
@@ -135,13 +94,17 @@ const SideMenu = () => {
     setActiveTab(x.title);
   };
 
-  
+  useEffect(() => { 
+    getTables(dispatchAction);
+    setActiveTab("Tasks")
+   }, []);
 
   return (
-
+    <>
+    { pending===false && availibleTables.length === 2 ? (
+      
     <div className={cn("section", styles.section,)}>
       <div className={cn("container", styles.container)}>
-
         <Dropdown
           className={cn("tablet-show", styles.dropdown)}
           options={options}
@@ -151,11 +114,11 @@ const SideMenu = () => {
 
         <div className="border-solid border border-slate-300/10 hover:border-slate-50/10 bg-gray-900/60 backdrop-blur-sm w-72 flex flex-col shrink-0 items-start justify-between p-12 pb-0 pr-8 rounded-3xl mr-36">
           <div className="font-bold m-auto pb-6 text-center tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-slate-300 to-gray-900">
-            ADMIN PANEL
+            {availibleTables[0].head} PANEL
           </div>
           <div className="h-px w-full bg-slate-600 mb-6">
           </div>
-          {items.map((subarray, index) => (
+          {availibleTables.map((subarray, index) => (
             <div key={index} className="last: mb-4">
               <h3 className="text-white mb-4 pr-5 rounded-xl font-semibold uppercase text-xs" key={index}>
               
@@ -184,17 +147,20 @@ const SideMenu = () => {
           </div>
         </div>
         <div className="w-full pr-32">
-          {activeTab === options[0] && <AnalyticsDashboard title={activeTab}/>}
-          {activeTab === options[1] && <Kanban title={activeTab}/>}
-          {activeTab === options[2] && <CustomersTable title={activeTab} rows={dataCustomers}/>}
-          {activeTab === options[3] && <RepresentativesTable title={activeTab} rows={dataRepresentatives}/>}
-          {activeTab === options[4] && <Table title={activeTab} />}
-          {activeTab === options[5] && <EmployeeTable title={activeTab} rows={dataEmployees}/>}
-          {activeTab === options[6] && <Profile title={activeTab}/>}
-          {activeTab === options[7] && <Navigate to="/login"/>}
+          
+            {activeTab === "Analytics" && <AnalyticsDashboard title={activeTab}/>}
+            {activeTab === "Tasks" && <Kanban title={activeTab}/>}
+            {activeTab === "Customers" && <CustomersTable title={activeTab} rows={dataCustomers}/>}
+            {activeTab === "Representatives" && <RepresentativesTable title={activeTab} rows={dataRepresentatives}/>}
+            {activeTab === "Contracts" && <Table title={activeTab} />}
+            {activeTab === "Employees" && <EmployeeTable title={activeTab} rows={dataEmployees}/>}
+            {activeTab === "Profile" && <Profile title={activeTab}/>}
+            {activeTab === "Sign Out" && <Navigate to="/login"/>}
+           
         </div>
-      </div>
-    </div>
+        </div>
+    </div>) : <Loader></Loader> }
+    </>           
   );
 };
 

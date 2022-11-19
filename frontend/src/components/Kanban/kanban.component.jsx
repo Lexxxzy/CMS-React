@@ -1,75 +1,25 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BreadCrumbs from '../Breadcrumbs/breadcrumbs.component'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import Card from './Card/card.component'
 import './kanban.styles.sass'
 import cn from "classnames"
 import EditModal from '../EditModalUser/editUserModal.component'
-import { Button } from 'flowbite-react'
-
-const mockData= [
-  {
-    id: "1",
-    title: 'In progress',
-    tasks: [
-      {
-        id: "1",
-        title: 'Телефонный звонок',
-        from_date: '25.09.2022',
-        to_date: '30.09.2022',
-        author: 'Герасимов А.А.',
-        representative: 'Смирнов В.В.',
-        executor: 'Иванов А.Ф.',
-        contract: '#1343245',
-        priority: 1
-      },
-      {
-        id: "2",
-        title: 'Отправка e-mail о послегарантийном ремонте',
-        from_date: '25.09.2022',
-        to_date: '30.09.2022',
-        author: 'Герасимов А.А.',
-        representative: 'Смирнов В.В.',
-        executor: 'Иванов А.Ф.',
-        contract: '#1343245',
-        priority: 2
-      }
-    ]
-  },
-  {
-    id: "2",
-    title: 'Done',
-    tasks: [
-      {
-        id: "3",
-        title: 'Телефонный звонок',
-        from_date: '25.09.2022',
-        to_date: '30.09.2022',
-        author: 'Герасимов А.А.',
-        representative: 'Смирнов В.В.',
-        executor: 'Иванов А.Ф.',
-        contract: '#1343245',
-        priority: 1
-      },
-      {
-        id: "4",
-        title: 'Отправка e-mail о послегарантийном ремонте',
-        from_date: '25.09.2022',
-        to_date: '30.09.2022',
-        author: 'Герасимов А.А.',
-        representative: 'Смирнов В.В.',
-        executor: 'Иванов А.Ф.',
-        contract: '#1343245',
-        priority: 2
-      }
-    ]
-  }
-]
+import { useDispatch, useSelector } from 'react-redux'
+import { getTasks } from '../../calls/cmsCalls'
+import Loader from '../Loader'
+import { swapTasks } from '../../data/tasksSlice'
 
 const taskRows = ["Task title","Deadline","Representative","Executor","Contract","Priority"];
 
 function Kanban({ title }) {
-  const [data, setData] = useState(mockData)
+  const dispatchAction = useDispatch();
+  const { tasks, pending, error, errorText } = useSelector((state) => state.tasks)
+
+  useEffect(() => { 
+    getTasks(dispatchAction);
+   }, []);
+
 
   const onDragEnd = result => {
     if(!result.destination) return
@@ -78,11 +28,11 @@ function Kanban({ title }) {
 
     if (source.droppableId !== destination.droppableId) 
     {
-      const sourceColIndex = data.findIndex(e => e.id === source.droppableId)
-      const destinationColIndex = data.findIndex(e => e.id === destination.droppableId)
+      const sourceColIndex = tasks.findIndex(e => e.id === source.droppableId)
+      const destinationColIndex = tasks.findIndex(e => e.id === destination.droppableId)
 
-      const sourceCol = data[sourceColIndex]
-      const destinationCol = data[destinationColIndex]
+      const sourceCol = tasks[sourceColIndex]
+      const destinationCol = tasks[destinationColIndex]
 
       const sourceTask = [...sourceCol.tasks]
       const destinationTask = [...destinationCol.tasks]
@@ -90,16 +40,20 @@ function Kanban({ title }) {
       const [removed] = sourceTask.splice(source.index,1)
       destinationTask.splice(destination.index,0,removed)
 
-      data[sourceColIndex].tasks = sourceTask
-      data[destinationColIndex].tasks = destinationTask
 
-      setData(data)
+      dispatchAction(swapTasks({
+        sourceTasks: sourceTask,
+        sourceColIndex: sourceColIndex,
+        destinationTasks: destinationTask,
+        destinationColIndex: destinationColIndex,
+      }))
     }
   }
 
   return (
     <div className=" m-auto">
       <BreadCrumbs title={title} />
+      {pending===false && tasks.length === 2 ?  
       <div className="">
 
         <div className="flex justify-between items-center">
@@ -116,7 +70,7 @@ function Kanban({ title }) {
           <DragDropContext onDragEnd={onDragEnd}>
             <div className='flex flex-row justify-center'>
               {
-                data.map(section => (
+                tasks.map(section => (
                   <Droppable
                     key={section.id}
                     droppableId={section.id}
@@ -176,7 +130,7 @@ function Kanban({ title }) {
             </div>
           </DragDropContext>
         </div>
-      </div>
+      </div> : <Loader></Loader>}
     </div>
   )
 }

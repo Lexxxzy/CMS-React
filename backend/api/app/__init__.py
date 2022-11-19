@@ -20,6 +20,8 @@ def register_blueprints(app):
     with app.app_context():
         from routes.auth import auth
         app.register_blueprint(auth)
+        from routes.cms import cms
+        app.register_blueprint(cms)
     
     
 def initialize_extensions(app):
