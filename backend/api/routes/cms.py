@@ -15,12 +15,11 @@ def get_tables():
 
     if not user_login:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     user_role = get_user_role()['rolname']
     tables = get_available_tables(user_role)
-    
+
     return jsonify(tables)
-    
 
 
 @cms.route("/get-tasks")
@@ -29,10 +28,10 @@ def get_tasks():
 
     if not user_login:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     if get_user_role()['rolname'] == "db_admin":
         user_login = "db_admin"
-        
+
     try:
         with db.engine.connect() as connection:
             all_tasks = connection.execute(text('''
@@ -59,33 +58,34 @@ def get_tasks():
 
             completed_tasks = []
             not_completed_tasks = []
-            
+
             for row in all_tasks:
                 obj = dict(row)
-                
+
                 if obj['task_status'] == True:
                     completed_tasks.append(obj)
                 else:
                     not_completed_tasks.append(obj)
-            
+
             return jsonify([{
-                                'id': "1",
-                                'title': 'In progress',
-                                'tasks': not_completed_tasks
-                            },
-                            {
-                                'id': "2",
-                                'title': 'Done',
-                                'tasks': completed_tasks
-                            }])
-        
+                'id': "1",
+                'title': 'In progress',
+                'tasks': not_completed_tasks
+            },
+                {
+                'id': "2",
+                'title': 'Done',
+                'tasks': completed_tasks
+            }])
+
     except Exception:
         return jsonify({"error": "Some error occured"}), 500
-    
+
+
 @cms.route('/user-info')
 def get_user_info():
     user_login = session.get("user_id")
-    
+
     if not user_login:
         return jsonify({"error": "Unauthorized"})
 
@@ -97,14 +97,175 @@ def get_user_info():
                                                         position,
                                                         email,
                                                         tin,
+                                                        login,
                                                         passport,
                                                         CONCAT('₽', CAST(salary AS varchar)) AS salary,
                                                         age
                                                     FROM employee
                                                     WHERE login='dh';
                                                     '''.format(login=user_login)))
-            
+
             return jsonify([dict(row) for row in user_info])
-        
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/employees')
+def get_employees():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    if get_user_role()['rolname'] == "db_admin":
+        user_login = "db_admin"
+
+    try:
+        with db.engine.connect() as connection:
+            employees = connection.execute(text('''
+                                                    SET ROLE {login};
+
+                                                    SELECT 
+                                                        name,
+                                                        middle_name,
+                                                        surname,
+                                                        login,
+                                                        position,
+                                                        email,
+                                                        passport,
+                                                        tin,
+                                                        salary 
+                                                    FROM employee;
+                                                    '''.format(login=user_login)))
+
+            return jsonify([dict(row) for row in employees])
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/representatives')
+def get_representatives():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    if get_user_role()['rolname'] == "db_admin":
+        user_login = "db_admin"
+
+    try:
+        with db.engine.connect() as connection:
+            representatives = connection.execute(text('''
+                                                    SET ROLE {login};
+
+                                                    SELECT 
+                                                        name,
+                                                        middle_name,
+                                                        surname,
+                                                        position,
+                                                        email,
+                                                        org.org_title AS organization,
+                                                        tin,
+                                                        rep_phone_number AS phone,
+                                                        rep_internal_number AS internal_phone,
+                                                        age
+                                                    FROM company_representative rep
+                                                    JOIN public.organization org
+                                                    ON rep.organization = org.tax_id_number;
+                                                    '''.format(login=user_login)))
+
+            return jsonify([dict(row) for row in representatives])
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/analytics')
+def get_analytics():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    if get_user_role()['rolname'] == "db_admin":
+        user_login = "db_admin"
+    else:
+        return jsonify({"error": "Forbidden"}), 403
+
+    try:
+        with db.engine.connect() as connection:
+            recent_tasks = connection.execute(text('''
+                                                    SET ROLE {login};
+                                                    SELECT 
+                                                        task_status AS is_ready,
+                                                        task_type,
+                                                        TO_CHAR(creation_date, 'dd MON HH24:MI') AS date
+                                                    FROM task
+                                                    ORDER BY creation_date DESC
+                                                    LIMIT 5;
+                                                    '''.format(login=user_login)))
+
+            overall_stats = connection.execute(text('''
+                                                    SET ROLE {login};
+                                                    SELECT  (
+                                                            SELECT COUNT(1)
+                                                            FROM employee
+                                                            ) AS employee_count,
+                                                            (
+                                                            SELECT COUNT(1)
+                                                            FROM organization
+                                                            ) AS organization_count,
+                                                            (
+                                                            SELECT COUNT(1)
+                                                            FROM task
+                                                            WHERE task_status=true
+                                                            ) AS done_task_count,
+                                                            (
+                                                            SELECT COUNT(1)
+                                                            FROM task
+                                                            WHERE task_status=false
+                                                            ) AS in_progress_task_count,
+                                                            (
+                                                            SELECT COUNT(1)
+                                                            FROM task
+                                                            ) AS task_count;
+                                                    '''.format(login=user_login)))
+            tasks = [dict(row) for row in recent_tasks]
+            stats = [dict(row) for row in overall_stats]
+            return jsonify({'recent_tasks': tasks, 'overall_stats': stats[0]})
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/customers')
+def get_cutomers():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    if get_user_role()['rolname'] == "db_admin":
+        user_login = "db_admin"
+
+    try:
+        with db.engine.connect() as connection:
+            cutomers = connection.execute(text('''
+                                               SET ROLE {login};
+                                                SELECT 
+                                                    org.*, 
+                                                    postal.*, 
+                                                    CONCAT(rep.surname, ' ', SUBSTRING(rep.name,1,1), '. ', SUBSTRING(rep.middle_name,1,1), '.') AS representative
+                                                FROM organization org
+                                                JOIN postal_info postal 
+                                                ON postal.postal_info_id = org.postal_info_id
+                                                JOIN company_representative rep
+                                                ON rep.organization = org.tax_id_number;
+                                                '''.format(login=user_login)))
+
+            return jsonify([dict(row) for row in cutomers])
+
     except Exception:
         return jsonify({"error": "Some error occured"}), 500

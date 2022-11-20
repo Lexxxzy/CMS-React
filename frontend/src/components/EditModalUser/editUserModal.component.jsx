@@ -35,7 +35,9 @@ function EditModal(props) {
         
         <React.Fragment>
             <Button onClick={() => setVisible(true)} color="transparent">
+                <div className='-mb-4'>
                 {buttonText}
+                </div>
             </Button>
             <Modal
                 
@@ -46,8 +48,9 @@ function EditModal(props) {
                 <div className="bg-slate-900/10">
 
                     <Modal.Header>
+                    
                         {title.slice(0, title.length-1)}
-
+                        
                     </Modal.Header>
                     <Modal.Body>
                         <div className="p-6 space-y-6">
@@ -59,15 +62,14 @@ function EditModal(props) {
                                                 htmlFor={`field-${index}`}
                                                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                                             >
-                                                { title.charAt(0).toUpperCase() +  title.slice(1)}
+                                                { title.charAt(0).toUpperCase() +  title.slice(1).replaceAll('_', ' ')}
                                             </label>
                                             <input
-
                                                 type="text"
                                                 name={`field-${index}`}
                                                 id={`${title}`}
                                                 className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600/30 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder={data[title]}
+                                                placeholder={data[title]?.toString()}
                                                 onKeyDown={handleNext}
                                                 required="" />
                                         </div>
@@ -79,7 +81,7 @@ function EditModal(props) {
                     <div className='flex justify-center items-center '>
                         <Modal.Footer>
                             <Button onClick={() => setVisible(false)}>
-                                <div >Save all</div>
+                                <div>Save all</div>
                             </Button>
 
                         </Modal.Footer>

@@ -61,14 +61,34 @@ export const userSlice = createSlice(
                 state.userInfo = userInitial;
             },
 
-            setLogedInStatus: (state, action) => {
-                state.userInfo.isLogedIn = action.payload;
+            setLogedInStatusStart: (state) => {
+                state.pending = true;
             },
 
-            setUserInfo: (state, action) => {
-                state.userInfo.email = action.payload.email;
-                state.userInfo.phoneNumber = action.payload.phone;
+            setLogedInStatus: (state, action) => {
+                
+                state.userInfo.isLogedIn = action.payload;
+                state.pending = false;
+            },
+
+            setUserInfoStart: (state) => {
+                state.pending = true;
+            },
+            setUserInfoSuccess: (state, action) => {
                 state.userInfo.login = action.payload.login;
+                state.userInfo.email = action.payload.email;
+                state.userInfo.full_name = action.payload.full_name;
+                state.userInfo.passport = action.payload.passport;
+                state.userInfo.position = action.payload.position;
+                state.userInfo.tin = action.payload.tin;
+                state.userInfo.salary = action.payload.salary==="₽" ? "Not specified" : action.payload.salary;
+                state.userInfo.age = action.payload.age===null ? "Not specified" : action.payload.age;
+                state.pending = false;
+            },
+            setUserInfoError: (state,action) => {
+                state.errorText = action.payload.error;
+                state.pending = false;
+                state.error = true;
             },
 
             getTablesStart: (state) => {
@@ -86,6 +106,6 @@ export const userSlice = createSlice(
     }
 )
 
-export const { logInStart, logInSuccess, logInError, logInCancelled, 
-    logOut, setLogedInStatus, setUserInfo, getTablesStart, getTablesSuccess, getTablesError } = userSlice.actions;
+export const { logInStart, logInSuccess, logInError, logInCancelled, setLogedInStatusStart,
+    logOut, setLogedInStatus, setUserInfoStart, setUserInfoSuccess, setUserInfoError, getTablesStart, getTablesSuccess, getTablesError } = userSlice.actions;
 export default userSlice.reducer;

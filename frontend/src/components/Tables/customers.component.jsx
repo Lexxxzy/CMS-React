@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import EditModal from '../EditModalUser/editUserModal.component'
 import Table from '../Table/table.component'
 import cn from "classnames"
+import { getCustomers } from '../../calls/cmsCalls'
+import Loader from '../Loader'
 
 export default function CustomersTable(props) {
-    const { title, rows } = props
+    const { title } = props
     const customersColumns = ["title", "phone", "representative", "client", "city"]
 
     const formatPhoneNumber = (phone) => {
@@ -18,9 +20,16 @@ export default function CustomersTable(props) {
       
         return null
       };
+      const [pending, setPending] = useState(null);
+      const [customers, setCustomers] = useState();
+  
+      useEffect(() => {
+            getCustomers(setPending, setCustomers); 
+      }, [])
 
     return (
         <Table title={title}>
+        {pending===false ?
             <table className="backdrop-blur-sm w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs font-normal text-light-gray uppercase">
                     <tr>
@@ -34,7 +43,7 @@ export default function CustomersTable(props) {
                 </thead>
                 <tbody >
                     {
-                        rows.map((info, index) => (
+                        customers.map((info, index) => (
                             
                             <tr className="border-solid border-t w border-slate-300/20 hover:bg-gray-50/20 dark:hover:bg-gray-700/20" key={index}>
                                 <th
@@ -42,13 +51,13 @@ export default function CustomersTable(props) {
                                     className="flex items-center py-4 px-14 text-gray-900 whitespace-nowrap dark:text-white"
                                 >
                                 <div className="">
-                                    <div className="text-base font-semibold">{info["title"]}</div>
+                                    <div className="text-base font-semibold">{info["org_title"]}</div>
                                     <div className="font-normal text-gray-400">
-                                        {info["email"]}
+                                        {info["org_email"]}
                                     </div>
                                 </div>
                                 </th>
-                                <td className="py-4 px-6 font-semibold text-white">{formatPhoneNumber(info["phone"])}</td>
+                                <td className="py-4 px-6 font-semibold text-white">{formatPhoneNumber(info["org_phone_number"])}</td>
                                 <th
                                     scope="row"
                                     className="flex items-center py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
@@ -58,49 +67,18 @@ export default function CustomersTable(props) {
 
                                 </th>
                                 <td className={cn("py-4 px-6 font-medium", 
-                                                   info["client"] === "true" ? 'text-green-400' : 'text-red-500')}>{info["client"] === "true" ? 'Yes' : 'Not'}</td>
+                                                   info["is_client"] === true ? 'text-green-400' : 'text-red-500')}>{info["is_client"] === true ? 'Yes' : 'Not'}</td>
                                 <td className="py-4 px-6 font-semibold text-white">{info["city"]}</td>
                                 <td className="py-4 px-6">
-                                    <EditModal fields={Object.keys(info)} data={rows[index]} title={title}/>
+                                    <EditModal fields={Object.keys(info)} data={customers[index]} title={title}/>
                                 </td>
                                 
                             </tr>
                         ))
                     }
-                    {/*<tr className=" hover:bg-gray-50 dark:hover:bg-gray-700/30">
-            <th
-            scope="row"
-            className="flex items-center py-4 px-14 text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            <div className="">
-                <div className="text-base font-semibold">Проведение презентации</div>
-                <div className="font-normal text-gray-400">
-                Контракта нет
-                </div>
-            </div>
-            </th>
-            <td className="py-4 px-6 font-semibold text-white">Инна Дубкова</td>
-            <th
-            scope="row"
-            className="flex items-center py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            <div className="">
-                <div className="text-base font-semibold">Нортон</div>
-                <div className="font-normal text-gray-400">
-                Петр Белозеров
-                </div>
-            </div>
-            </th>
-            <td className="py-4 px-6 font-medium text-gray-400">21 DEC 9:28 PM</td>
-            <td className="py-4 px-6 font-medium text-green-400">Готово</td>
-            <td className="py-4 px-6">
-
-            <EditUserModal fields={columns}/>
-            </td>
-            </tr>*/}
 
                 </tbody>
-            </table>
+            </table> : <Loader></Loader>}
         </Table>
     )
 }

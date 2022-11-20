@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import EditUserModal from '../EditModalUser/editUserModal.component'
 import Table from '../Table/table.component'
 import cn from "classnames"
+import { useDispatch, useSelector } from 'react-redux'
+import { getRepresentatives } from '../../calls/cmsCalls'
+import Loader from '../Loader'
 
 export default function RepresentativesTable(props) {
-    const { title,  rows } = props
+    const { title } = props
     const employeeColumns = ["name", "company", "position", "phone"]
 
     const formatPhoneNumber = (phone) => {
@@ -19,9 +22,18 @@ export default function RepresentativesTable(props) {
         return null
       };
 
+      const dispatchAction = useDispatch();
+      useEffect(() => { 
+          getRepresentatives(dispatchAction);
+         }, []);
+  
+      const { representatives, pending } = useSelector((state) => state.representatives);
+
     return (
-        <Table title={title}>
+         <Table title={title}>
+         {pending===false ?
             <table className="backdrop-blur-sm w-full text-sm text-left text-gray-500 dark:text-gray-400">
+
                 <thead className="text-xs font-normal text-light-gray uppercase">
                     <tr>
                         {employeeColumns.map((columnTitle, index) => (
@@ -34,7 +46,7 @@ export default function RepresentativesTable(props) {
                 </thead>
                 <tbody >
                     {
-                        rows.map((info, index) => (
+                        representatives.map((info, index) => (
                             
                             <tr className="border-solid border-t w border-slate-300/20 hover:bg-gray-50/20 dark:hover:bg-gray-700/20" key={index}>
                                 <th
@@ -42,7 +54,7 @@ export default function RepresentativesTable(props) {
                                     className="flex items-center py-4 px-14 text-gray-900 whitespace-nowrap dark:text-white"
                                 >
                                 <div className="">
-                                    <div className="text-base font-semibold">{info["name"]} {info["middle name"]} {info["surname"]}</div>
+                                    <div className="text-base font-semibold">{info["name"]} {info["middle_name"]} {info["surname"]}</div>
                                     <div className="font-normal text-gray-400">
                                         {info["email"]}
                                     </div>
@@ -59,7 +71,7 @@ export default function RepresentativesTable(props) {
                                 </th>
                                 <td className="py-4 px-6 font-medium text-white">{formatPhoneNumber(info["phone"])}</td>
                                 <td className="py-4 px-6">
-                                    <EditUserModal fields={Object.keys(info)} data={rows[index]} title={title}/>
+                                    <EditUserModal fields={Object.keys(info)} data={representatives[index]} title={title}/>
                                 </td>
                                 
                             </tr>
@@ -98,7 +110,7 @@ export default function RepresentativesTable(props) {
             </tr>*/}
 
                 </tbody>
-            </table>
+            </table> : <Loader></Loader>}
         </Table>
     )
 }

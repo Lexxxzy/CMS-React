@@ -7,9 +7,9 @@ function Card({ task }) {
     return (
         <div className='p-7 dark:bg-slate-900/40 rounded-lg border border-solid border-slate-300/10 mb-5'>
             <div className='text-white font-bold text-lg p-4 text-left'>
-                <h3 className='leading-4'>
-                    {title.slice(0, 20)} {title.length > 17 && "..."}
-                    <button className={cn("absolute  ml-3 w-4 h-4 rounded-full bg-transparent border-4 border-solid  text-white",
+                <h3 className='flex justify-items-left align-middle content-center leading-4'>
+                    <span className='mt-4'>{title.slice(0, 20)} {title.length > 17 && "..."}</span>
+                    <button className={cn("ml-3 mt-4 w-4 h-4 rounded-full bg-transparent border-4 border-solid  text-white",
                         priority === "0" && "border-green-400", (priority === "1" || priority === "010") && "border-orange-400", priority === 2 && "border-red-500")} />
                 </h3>
                 <div className='mt-1 pt-0'>

@@ -79,7 +79,7 @@ function Kanban({ title }) {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className='mb-10 p-10 bg-slate-900/20 rounded-2xl first:mr-20 h-fit w-1/2 border-slate-300/10 border-solid border'
+                          className='mb-10 p-10 bg-slate-900/20 rounded-2xl first:mr-20 w-1/2 max-h-[54rem] border-slate-300/10 border-solid border'
                         >
                           <div className ='text-white font-bold text-xl p-4 text-left mb-5'>
                             <h3 className=''>
@@ -91,7 +91,7 @@ function Kanban({ title }) {
                               Overall — {section.tasks.length} {section.tasks.length===1 ? "task" : "tasks"}
                             </span>
                           </div>
-                          <div className='kanban__section__content'>
+                          <div className='overflow-y-auto h-[39.5rem] kanban__section__content'>
                             {section.tasks.map((task, index) => (
                                 <Draggable
                                   key={task.id}

@@ -33,7 +33,7 @@ export default function Login() {
     }
 
     const HandleLogin = () => {
-        logUserIn(account.email, account.password, dispatchAction);
+        logUserIn(account.email, account.password, dispatchAction, navigate);
     }
     return (
         <div className='flex flex-col h-screen justify-center'>

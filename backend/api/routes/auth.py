@@ -126,7 +126,7 @@ def login_user():
         return jsonify({"error": validation})
 
     session["user_id"] = get_user_login(email)
-    
+
     return {"email": email}
 
 
@@ -139,7 +139,7 @@ def logout_user():
 @auth.route("/@me")
 def get_user():
     user_login = session.get("user_id")
-
+    print(session.get("user_id"))
     if not user_login:
         return jsonify({"error": "Unauthorized"})
 

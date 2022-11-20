@@ -10,6 +10,9 @@ module.exports = {
       fontFamily: {
         'Inter': ['Inter', 'sans-serif'] 
       },
+      height: {
+        '128': '40rem',
+      }
     },
     fontSize: {
       xs: '11px',

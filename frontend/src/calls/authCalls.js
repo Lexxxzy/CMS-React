@@ -1,5 +1,5 @@
 import axios from "axios";
-import { logOut, setLogedInStatus, logInError, logInSuccess, logInStart, getTablesStart, getTablesError, getTablesSuccess } from "../data/userSlice";
+import { logOut, setLogedInStatus, logInError, logInSuccess, logInStart, getTablesStart, getTablesError, getTablesSuccess, setLogedInStatusStart } from "../data/userSlice";
 
 const server = axios.create({
   withCredentials: true,
@@ -9,12 +9,14 @@ const serverIp = "http://127.0.0.1:5000";
 
 export const isLoggedIn = async (dispatchAction) => {
   try {
+    dispatchAction(setLogedInStatusStart);
     const resp = await server.get(serverIp + "/@me");
 
     if (resp.data.error === "Unauthorized") {
-      dispatchAction(logOut())
-      window.location.href = "/login"
+      console.log("nooo");
+      //dispatchAction(logOut())
     } else {
+      console.log("yeeee");
       dispatchAction(setLogedInStatus(true))
     }
   } catch (error) {
@@ -23,7 +25,7 @@ export const isLoggedIn = async (dispatchAction) => {
 
 }
 
-export const logUserIn = async (email, password, dispatchAction) => {
+export const logUserIn = async (email, password, dispatchAction, navigate) => {
     try {
       dispatchAction(logInStart())
       
@@ -37,10 +39,8 @@ export const logUserIn = async (email, password, dispatchAction) => {
         dispatchAction(logInError(resp.data));
       }
       else {
-        getTables(dispatchAction);
-
         dispatchAction(logInSuccess(resp.data));
-        window.location.href = "/"
+        navigate("/")
       }
   
   
@@ -63,6 +63,6 @@ export const logUserIn = async (email, password, dispatchAction) => {
   
   
     } catch (error) {
-      dispatchAction(logInError({ "error": "An error occurred. Request again later" }));
+      dispatchAction(getTablesError());
     }
   };

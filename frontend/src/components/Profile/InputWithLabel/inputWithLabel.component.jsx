@@ -3,7 +3,7 @@ import React from 'react'
 export default function InputWithLabel(props) {
     const {label, placeholder, isRequired = false, isDisabled=true} = props
     return (
-        <div className='flex flex-col pb-5 w-42'>
+        <div className='flex flex-col pb-5 w-1/4 mr-5'>
             <label
                 htmlFor="position"
                 className="mb-2.5 block text-sm font-semibold text-gray-900 dark:text-slate-200"

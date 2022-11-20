@@ -15,30 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTables } from "../../calls/authCalls";
 import Loader from "../Loader";
 
-const dataEmployees = [
-  {
-    name: "Инна",
-    "middle name": "Алексеевна",
-    surname: "Дубкова",
-    login: "idubkova",
-    position: "Менеджер",
-    email: "dubkova@wma.ru",
-    passport: "3344 4343",
-    tin: "343432432534",
-    salary: "67,232"
-  },
-  {
-    name: "Aнна",
-    "middle name": "Алексеевна",
-    surname: "Дубкова",
-    login: "idubkova",
-    position: "Менеджер",
-    email: "dubkova@wma.ru",
-    passport: "3344 4343",
-    tin: "343432432534",
-    salary: "67,232"
-  }
-]
 
 const dataCustomers = [
   {
@@ -55,23 +31,6 @@ const dataCustomers = [
     "representative" : "Смирнов Г.A."
   },
 ]
-
-const dataRepresentatives = [
-  {
-    name: "Aнна",
-    "middle name": "Алексеевна",
-    surname: "Дубкова",
-    tin: "150342858572",
-    position: "Менеджер",
-    email: "dubkova@wma.ru",
-    phone: "89819261572",
-    "internal phone": "343432432534",
-    organization: "LackOn",
-    age: "34"
-  }
-]
-
-
 
 const SideMenu = () => {
   const dispatchAction = useDispatch();
@@ -148,12 +107,12 @@ const SideMenu = () => {
         </div>
         <div className="w-full pr-32">
           
-            {activeTab === "Analytics" && <AnalyticsDashboard title={activeTab}/>}
+            {activeTab === "Analytics" && <AnalyticsDashboard title={activeTab} setActiveTab={setActiveTab}/>}
             {activeTab === "Tasks" && <Kanban title={activeTab}/>}
             {activeTab === "Customers" && <CustomersTable title={activeTab} rows={dataCustomers}/>}
-            {activeTab === "Representatives" && <RepresentativesTable title={activeTab} rows={dataRepresentatives}/>}
+            {activeTab === "Representatives" && <RepresentativesTable title={activeTab} />}
             {activeTab === "Contracts" && <Table title={activeTab} />}
-            {activeTab === "Employees" && <EmployeeTable title={activeTab} rows={dataEmployees}/>}
+            {activeTab === "Employees" && <EmployeeTable title={activeTab} />}
             {activeTab === "Profile" && <Profile title={activeTab}/>}
             {activeTab === "Sign Out" && <Navigate to="/login"/>}
            
