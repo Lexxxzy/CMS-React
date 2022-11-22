@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getTasks } from '../../calls/cmsCalls'
 import Loader from '../Loader'
 import { swapTasks } from '../../data/tasksSlice'
+import AddTaskModal from './Modal/addTaskModal.component'
 
 const taskRows = ["Task title","Deadline","Representative","Executor","Contract","Priority"];
 
@@ -119,7 +120,7 @@ function Kanban({ title }) {
                               ))}
                           </div>
                           <div className='text-slate-500 underline '>
-                          <EditModal fields={taskRows} data={[]} title="Add taskk" buttonText="Add task"/>
+                          <AddTaskModal fields={taskRows} options={["s","s"]} selectedRepresentative="sdsa" setRepresentative={() => "s"} title="Add taskk" buttonText="Add task"/>
                           </div>
                           {provided.placeholder}
                         </div>

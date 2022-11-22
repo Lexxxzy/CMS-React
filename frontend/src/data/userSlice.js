@@ -57,6 +57,25 @@ export const userSlice = createSlice(
                 state.email = null;
             },
 
+            regiterStart: (state) => {
+                state.pending = true;
+            },
+            regiterNext: (state) => {
+                state.error = false;
+                state.pending = false;
+            },
+            regiterSuccess: (state, action) => {
+                state.pending = false;
+                state.error = false;
+                state.userInfo.isLogedIn = true;
+            },
+            regiterError: (state, action) => {
+                state.errorText = action.payload.error;
+                state.pending = false;
+                state.error = true;
+            },
+
+
             logOut: (state) => {
                 state.userInfo = userInitial;
             },
@@ -107,5 +126,6 @@ export const userSlice = createSlice(
 )
 
 export const { logInStart, logInSuccess, logInError, logInCancelled, setLogedInStatusStart,
-    logOut, setLogedInStatus, setUserInfoStart, setUserInfoSuccess, setUserInfoError, getTablesStart, getTablesSuccess, getTablesError } = userSlice.actions;
+    logOut, setLogedInStatus, setUserInfoStart, setUserInfoSuccess, setUserInfoError, getTablesStart, 
+    getTablesSuccess, getTablesError, regiterStart, regiterNext, regiterSuccess, regiterError } = userSlice.actions;
 export default userSlice.reducer;

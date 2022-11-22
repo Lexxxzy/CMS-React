@@ -269,3 +269,68 @@ def get_cutomers():
 
     except Exception:
         return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/representative-names')
+def get_rep_names():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    try:
+        with db.engine.connect() as connection:
+            reps = connection.execute(text('''
+                                               SELECT 
+                                                    CONCAT(rep.surname, ' ', SUBSTRING(rep.name,1,1), '. ', SUBSTRING(rep.middle_name,1,1), '.') AS full_name,
+                                                    org.org_title,
+                                                    tin
+                                                FROM public.company_representative rep
+                                                JOIN organization org
+                                                ON org.tax_id_number = rep.organization;
+                                                '''))
+
+            return jsonify([dict(row) for row in reps])
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/employees-names')
+def get_emp_names():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    try:
+        with db.engine.connect() as connection:
+            emps = connection.execute(text('''
+                                               SELECT 
+                                                    CONCAT(emp.surname, ' ', SUBSTRING(emp.name,1,1), '. ', SUBSTRING(emp.middle_name,1,1), '.') AS full_name,
+                                                    passport
+                                                FROM public.employee emp;
+                                                '''))
+
+            return jsonify([dict(row) for row in emps])
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/contacts-ids')
+def get_contact_ids():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    try:
+        with db.engine.connect() as connection:
+            emps = connection.execute(
+                text('''SELECT contract_id FROM public.contract;'''))
+
+            return jsonify([dict(row)["contract_id"] for row in emps])
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}), 500

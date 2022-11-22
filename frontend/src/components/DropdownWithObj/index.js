@@ -4,7 +4,7 @@ import styles from "./Dropdown.module.sass";
 import Icon from "../Icon";
 import OutsideClickHandler from "react-outside-click-handler";
 
-const Dropdown = ({ className, value, setValue, options, empty, isTask=false }) => {
+const DropdownWithObj = ({ className, value, setValue, options, empty, objKey,secondObjKey=null, isTask=false }) => {
   const [visible, setVisible] = useState(false);
 
   const handleClick = (value) => {
@@ -20,12 +20,12 @@ const Dropdown = ({ className, value, setValue, options, empty, isTask=false }) 
         })}
       >
         <div className={cn(styles.head, `${!isTask ? 'bg-slate-800/50' : 'bg-gray-600/30'}`)} onClick={() => setVisible(!visible)}>
-          <div className={styles.selection}>{value}</div>
+          <div className={styles.selection}>{value[objKey]}</div>
           <div className={styles.arrow}>
             <Icon name="arrow" size="10" />
           </div>
         </div>
-        <div className={cn(styles.body, 'backdrop-blur-sm overflow-y-auto h-[8.5rem] min-h-fit',  `${!isTask ? 'bg-gray-900/90' : 'bg-gray-600/30'}`)}>
+        <div className={cn(styles.body, 'backdrop-blur-md overflow-y-auto h-[11.5rem] min-h-fit',  `${!isTask ? 'bg-gray-900/90' : 'bg-gray-600/30'}`)}>
           {options.map((x, index) => (
             <div
               className={cn(styles.option, {
@@ -34,7 +34,9 @@ const Dropdown = ({ className, value, setValue, options, empty, isTask=false }) 
               onClick={() => handleClick(x, index)}
               key={index}
             >
-              {x}
+              {x[objKey]}
+              {secondObjKey!==null && 
+              <div className="font-light text-slate-300/80 text-xs">{x[secondObjKey]}</div>}
             </div>
           ))}
         </div>
@@ -43,4 +45,4 @@ const Dropdown = ({ className, value, setValue, options, empty, isTask=false }) 
   );
 };
 
-export default Dropdown;
+export default DropdownWithObj;

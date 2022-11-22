@@ -16,26 +16,32 @@ def register_user_first_step():
         email = request.json["email"]
         login = request.json["login"]
         password = request.json["password"]
+        confirm_password = request.json["confirmPassword"]
         role = request.json["role"]
+        
+        
     except KeyError:
         return jsonify({"error": 'All fields must be filled'})
 
     validation_result = validate_account(email, password, login)
-
+    print("valid: ", validation_result)
     if validation_result != "ALL_VALID":
-        return jsonify({"error": validation_result}), 400
+        return jsonify({"error": validation_result})
 
+    if (password!=confirm_password):
+        return jsonify({"error": "Passwords must match"})
+    
     already_exists = check_user_exists(login, email)
 
     if already_exists != "ALL_VALID":
-        return jsonify({"error": already_exists}), 409
+        return jsonify({"error": already_exists})
 
     role = validate_role(role)
 
     if role == "Invalid value":
-        return jsonify({"error": "Invalid role value"}), 400
+        return jsonify({"error": "Invalid role value"})
 
-    return jsonify("ALL_VALID"), 200
+    return jsonify("ALL_VALID")
 
 
 @auth.route("/auth/register-final", methods=["POST"])
@@ -58,33 +64,33 @@ def register_user():
     validation = validate_account(email, password, login)
 
     if validation != "ALL_VALID":
-        return jsonify({"error": validation}), 400
+        return jsonify({"error": validation})
 
     validation = check_user_exists(login, email)
 
     if validation != "ALL_VALID":
-        return jsonify({"error": validation}), 409
+        return jsonify({"error": validation})
 
     validation = validate_role(role)
 
     if validation == "Invalid value":
-        return jsonify({"error": "Invalid role value"}), 400
+        return jsonify({"error": "Invalid role value"})
     role = validation
 
     validation = validate_name(name, surname, middle_name)
 
     if validation != "ALL_VALID":
-        return jsonify({"error": validation}), 400
+        return jsonify({"error": validation})
 
     validation = validate_input(position)
 
     if validation != "ALL_VALID":
-        return jsonify({"error": "Invalid position value"}), 400
+        return jsonify({"error": "Invalid position value"})
 
     validation = validate_documents(tin, passport)
 
     if validation != "ALL_VALID":
-        return jsonify({"error": validation}), 400
+        return jsonify({"error": validation})
 
     hashed_password = hash_password(password)
 

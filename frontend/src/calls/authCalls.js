@@ -1,5 +1,5 @@
 import axios from "axios";
-import { logOut, setLogedInStatus, logInError, logInSuccess, logInStart, getTablesStart, getTablesError, getTablesSuccess, setLogedInStatusStart } from "../data/userSlice";
+import { logOut, setLogedInStatus, logInError, logInSuccess, logInStart, getTablesStart, getTablesError, getTablesSuccess, setLogedInStatusStart, regiterNext, regiterStart, regiterError, regiterSuccess } from "../data/userSlice";
 
 const server = axios.create({
   withCredentials: true,
@@ -40,6 +40,76 @@ export const logUserIn = async (email, password, dispatchAction, navigate) => {
       }
       else {
         dispatchAction(logInSuccess(resp.data));
+        navigate("/")
+      }
+  
+  
+    } catch (error) {
+      dispatchAction(logInError({ "error": "An error occurred. Request again later" }));
+    }
+  };
+
+
+  export const registerUserFirstStep = async (userInfo, dispatchAction) => {
+
+    try {
+      const {email, login, password, confirmPassword, role} = userInfo;
+
+      dispatchAction(regiterStart())
+      
+      const resp = await server.post(`${serverIp}/auth/register-first-step`, {
+        email,
+        password,
+        login,
+        confirmPassword,
+        role,
+      });
+      
+      console.log("resp: ", resp)
+      if (resp.data.error != null) {
+        dispatchAction(regiterError(resp.data));
+        return false
+      }
+      else {
+        dispatchAction(regiterNext());
+        return true
+      }
+  
+  
+    } catch (resp) {
+      dispatchAction(regiterError({ "error": resp.data.error }));
+      return false
+    }
+  };
+
+
+  export const registerUser = async (userInfo, dispatchAction, navigate) => {
+
+    try {
+      const {email, login, password, confirmPassword, role, surname, name, middle_name, tin, passport, position} = userInfo;
+
+      dispatchAction(regiterStart())
+      
+      const resp = await server.post(`${serverIp}/auth/register-final`, {
+        email,
+        password,
+        login,
+        confirmPassword,
+        role,
+        surname,
+        name,
+        middle_name,
+        tin,
+        passport,
+        position
+      });
+      
+
+      if (resp.data.error != null) {
+        dispatchAction(regiterError(resp.data));
+      }
+      else {
+        dispatchAction(regiterSuccess());
         navigate("/")
       }
   
