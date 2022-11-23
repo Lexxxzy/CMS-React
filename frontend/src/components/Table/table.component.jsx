@@ -2,7 +2,7 @@ import React from 'react';
 import BreadCrumbs from '../Breadcrumbs/breadcrumbs.component';
 
 export default function Table(props) {
-  const { title } = props
+  const { title, query } = props
   return (
     <div className=" m-auto">
       <BreadCrumbs title={title} />
@@ -42,6 +42,7 @@ export default function Table(props) {
               className="block pl-10 w-52 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500
             dark:bg-gray-900/30 dark:border-gray-500/50 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder={`Search for ${title.toLowerCase()}`}
+               onChange={query!==undefined ? (e) => query(e.target.value.toLowerCase()) : ()=> ("") }
             />
           </div>
         </div>

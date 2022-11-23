@@ -28,7 +28,7 @@ export const userSlice = createSlice(
                 "tin": null
             },
             availibleTables: [],
-            pending: false,
+            pending: null,
             error: false,
             errorText: null,
         },
@@ -85,7 +85,7 @@ export const userSlice = createSlice(
             },
 
             setLogedInStatus: (state, action) => {
-                
+                console.log("from slice: ", action.payload)
                 state.userInfo.isLogedIn = action.payload;
                 state.pending = false;
             },

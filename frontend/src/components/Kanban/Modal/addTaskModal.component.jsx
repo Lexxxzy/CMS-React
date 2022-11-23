@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'flowbite-react';
 import Dropdown from '../../Dropdown'
 import OutsideClickHandler from "react-outside-click-handler";
-import { getContractIds, getEmployeesNames, getRepresentativesNames } from '../../../calls/cmsCalls';
+import { addTask, getContractIds, getEmployeesNames, getRepresentativesNames } from '../../../calls/cmsCalls';
 import DropdownWithObj from '../../DropdownWithObj';
+import { useDispatch, useSelector } from 'react-redux';
 
 const handleNext = (e) => {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
@@ -24,18 +25,34 @@ const handleNext = (e) => {
 
 }
 
-
+const getPriority = (priority) => {
+    switch (priority) {
+        case 'Low':
+            return "0"
+        case 'Medium':
+            return "010"
+        case 'High':
+            return "100"
+        default:
+            return "0"
+    }
+}
 
 function AddTaskModal(props) {
-    const { title, buttonText = "More Info" } = props
+    const { title, snackbarRef, setErrorAddTask,errorAddTask, buttonText = "More Info" } = props
 
     const [visible, setVisible] = useState(false);
+    const dispatch = useDispatch();
 
     const [pending, setPending] = useState(false);
     const [representatives, setRepresentatives] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [contracts, setContracts] = useState([]);
-    const priorities = ["Low", "Medium", "High"]
+    
+    const priorities = ["Low", "Medium", "High"];
+
+    
+    const { tasks } = useSelector((state) => state.tasks)
 
     useEffect(() => {
         const firstField = document.querySelector("input[name=field-0]");
@@ -60,9 +77,24 @@ function AddTaskModal(props) {
     const [taskTitle, setTaskTitle] = useState("")
     const [deadLine, setDeadline] = useState("")
 
-    const handleAddTask = () => {
-        console.log(selectedEmployee, taskTitle,deadLine)
-        //setVisible(false)
+    const handleAddTask = async () => {
+        
+        const task = {
+            "representative": selectedRepresentative.tin,
+            "executor": selectedEmployee.passport,
+            contract: selectedContract,
+            priority: getPriority(selectedPriority),
+            "title": taskTitle,
+            "to_date": deadLine,
+            "task_status": false
+        }
+        const isAdded = await addTask(task, setErrorAddTask, dispatch);
+
+        snackbarRef.current.show();
+
+        if (isAdded === true){
+            setVisible(false)
+        }
     }
 
     const handleKeyUpDate = (e) => {

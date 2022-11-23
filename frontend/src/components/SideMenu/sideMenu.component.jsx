@@ -15,23 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTables } from "../../calls/authCalls";
 import Loader from "../Loader";
 
-
-const dataCustomers = [
-  {
-    "tax id" : "1458992782",
-    "title" : "LackOn"	,
-    "email" : "lackon@mail.ru",
-    "payment account" : 50788216500000008245,
-    "phone" : "84998996899",
-    "client" : "true",
-    "postal code" : "302457",
-    "city" : "Дорохово",
-    "address" : "шоссе Чехова, 36",
-    "map" : "(-26.116548,-88.028458)",
-    "representative" : "Смирнов Г.A."
-  },
-]
-
 const SideMenu = () => {
   const dispatchAction = useDispatch();
   const { availibleTables, pending, error } = useSelector((state) => state.user);
@@ -109,7 +92,7 @@ const SideMenu = () => {
           
             {activeTab === "Analytics" && <AnalyticsDashboard title={activeTab} setActiveTab={setActiveTab}/>}
             {activeTab === "Tasks" && <Kanban title={activeTab}/>}
-            {activeTab === "Customers" && <CustomersTable title={activeTab} rows={dataCustomers}/>}
+            {activeTab === "Customers" && <CustomersTable title={activeTab}/>}
             {activeTab === "Representatives" && <RepresentativesTable title={activeTab} />}
             {activeTab === "Contracts" && <Table title={activeTab} />}
             {activeTab === "Employees" && <EmployeeTable title={activeTab} />}

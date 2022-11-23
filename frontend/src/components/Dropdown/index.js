@@ -20,7 +20,7 @@ const Dropdown = ({ className, value, setValue, options, empty, isTask=false }) 
         })}
       >
         <div className={cn(styles.head, `${!isTask ? 'bg-slate-800/50' : 'bg-gray-600/30'}`)} onClick={() => setVisible(!visible)}>
-          <div className={styles.selection}>{value}</div>
+          <div className={styles.selection}>{value==null ? 'None' : value}</div>
           <div className={styles.arrow}>
             <Icon name="arrow" size="10" />
           </div>
@@ -34,7 +34,7 @@ const Dropdown = ({ className, value, setValue, options, empty, isTask=false }) 
               onClick={() => handleClick(x, index)}
               key={index}
             >
-              {x}
+              {x === null ? 'None' : x}
             </div>
           ))}
         </div>

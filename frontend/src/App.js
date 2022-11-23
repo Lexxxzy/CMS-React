@@ -7,17 +7,22 @@ import Register from './components/Register/register.component';
 import PrivateRoutes from './utils/PrivateRoutes';
 import { useEffect } from 'react';
 import { isLoggedIn } from './calls/authCalls';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
+  const dispatchAction = useDispatch();
+  useEffect(() => { isLoggedIn(dispatchAction); console.log("enre")}, []);
+  const { userInfo,pending} = useSelector((state) => state.user);
   return (
     <Routes>
       <Route path="/login" element={<Login />}/>
       <Route path="/register" element={<Register />}/>
 
-      <Route element={<PrivateRoutes/>}>
-          <Route path='/' element={<SideMenu/>} />
+      <Route element={<PrivateRoutes/>}>         
       </Route>
+
+      {userInfo.isLogedIn===true ? <Route path='/' element={<SideMenu/>} /> 
+                                  : <Route path='/' element={<Login/>} />}
     </Routes>
   );
 }

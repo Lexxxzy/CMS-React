@@ -9,14 +9,13 @@ const serverIp = "http://127.0.0.1:5000";
 
 export const isLoggedIn = async (dispatchAction) => {
   try {
-    dispatchAction(setLogedInStatusStart);
+    dispatchAction(setLogedInStatusStart());
     const resp = await server.get(serverIp + "/@me");
 
     if (resp.data.error === "Unauthorized") {
-      console.log("nooo");
-      //dispatchAction(logOut())
+      // dispatchAction(logOut())
+      console.log("unauth")
     } else {
-      console.log("yeeee");
       dispatchAction(setLogedInStatus(true))
     }
   } catch (error) {

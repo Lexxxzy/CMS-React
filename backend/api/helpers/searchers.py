@@ -31,3 +31,18 @@ def get_user_login(email):
             return "User is not exists"
         
         return result_arr[0]['login']
+    
+def get_user_passport(login):
+    with db.engine.connect() as connection:
+        search_result = connection.execute(text('''
+                                                SELECT passport 
+                                                FROM public.employee 
+                                                WHERE login='{login}';
+                                                '''.format(login=login)))
+        
+        result_arr = [dict(row) for row in search_result]
+        
+        if len(result_arr) == 0:
+            return "User is not exists"
+        
+        return result_arr[0]['passport']  

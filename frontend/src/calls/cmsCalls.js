@@ -4,7 +4,7 @@ import { getRepresentativesError, getRepresentativesStart, getRepresentativesSuc
 import { getTasksError, getTasksStart, getTasksSuccess } from "../data/tasksSlice";
 import { setUserInfoError, setUserInfoStart, setUserInfoSuccess } from "../data/userSlice";
 
-const server = axios.create({
+export const server = axios.create({
   withCredentials: true,
 });
 
@@ -100,10 +100,10 @@ export const getAnalytics = async (setPending, setAnalytics) => {
   }
 };
 
-export const getCustomers = async (setPending, setCustomers) => {
+export const getCustomers = async (setPending, setCustomers, query) => {
   try {
     setPending(true)
-    const resp = await server.get(`${serverIp}/customers`);
+    const resp = await server.get(`${serverIp}/customers`, { params: { customer: query } });
 
     if (resp.data.error != null) {
       console.error(resp.data.error)
@@ -116,6 +116,7 @@ export const getCustomers = async (setPending, setCustomers) => {
   } catch (error) {
     setPending(false)
     console.error({ "error": "An error occurred. Request again later" });
+    setCustomers([])
   }
 };
 
@@ -167,11 +168,55 @@ export const getContractIds = async (setPending, setContracts) => {
       setPending(false)
     }
     else {
+      resp.data.unshift(null)
       setContracts(resp.data)
       setPending(false)
     }
   } catch (error) {
     setPending(false)
     console.error({ "error": "An error occurred. Request again later" });
+  }
+};
+
+export const addTask = async (task, setErrorAddTask, dispatchAction) => {
+  try {
+    const resp = await server.post(`${serverIp}/task/add`, task);
+
+    if (resp.data.error != null) {
+      console.error(resp.data.error)
+      setErrorAddTask(true)
+
+      return false
+    }
+    else {
+      setErrorAddTask(false)
+      getTasks(dispatchAction)
+
+      return true
+    }
+  } catch (error) {
+    setErrorAddTask(true)
+    console.error({ "error": "An error occurred. Request again later" });
+
+    return false
+  }
+};
+
+export const updateTaskStatus = async (taskId) => {
+  try {
+    const resp = await server.patch(`${serverIp}/task/status`, {"task_id":taskId});
+
+
+    if (resp.data.error != null) {
+      console.error(resp.data.error)
+      return false
+    }
+    else {
+      return true
+    }
+  } catch (error) {
+    console.error({ "error": "An error occurred. Request again later" });
+
+    return false
   }
 };

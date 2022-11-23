@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app, session
-from helpers.validation import validate_account, check_mail, check_user_exists, validate_role, validate_name, validate_input, validate_documents
+from helpers.validation import validate_account, check_mail, check_user_exists, validate_role, validate_rep_tin, validate_input, validate_employee_id
 from sqlalchemy import text
 from app.extensions import db
 from helpers.checkers import get_available_tables
-from helpers.searchers import get_user_password, get_user_login
+from helpers.searchers import get_user_password, get_user_login, get_user_passport
 from routes.auth import get_user_role
+import re
 
 cms = Blueprint('cms', __name__, url_prefix="/cms")
 
@@ -251,6 +252,13 @@ def get_cutomers():
         user_login = "db_admin"
 
     try:
+        customer = request.args.get("customer", default="", type=str)
+    except KeyError:
+        customer = ''
+
+    customer = re.sub('[^\u0401\u0451\u0410-\u044fa-zA-Z]+', '', customer)
+
+    try:
         with db.engine.connect() as connection:
             cutomers = connection.execute(text('''
                                                SET ROLE {login};
@@ -262,9 +270,9 @@ def get_cutomers():
                                                 JOIN postal_info postal 
                                                 ON postal.postal_info_id = org.postal_info_id
                                                 JOIN company_representative rep
-                                                ON rep.organization = org.tax_id_number;
-                                                '''.format(login=user_login)))
-
+                                                ON rep.organization = org.tax_id_number
+                                                WHERE org.org_title ILIKE '%{query}%';
+                                                '''.format(login=user_login, query=customer)))
             return jsonify([dict(row) for row in cutomers])
 
     except Exception:
@@ -334,3 +342,89 @@ def get_contact_ids():
 
     except Exception:
         return jsonify({"error": "Some error occured"}), 500
+
+
+@cms.route('/task/status', methods=["PATCH"])
+def update_task_status():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    try:
+        task_id = request.json["task_id"]
+    except KeyError:
+        return jsonify({"error": "No task provided"})
+
+    if not task_id.isdigit():
+        return jsonify({"error": "Not valid input"})
+
+    try:
+        with db.engine.connect() as connection:
+            connection.execute(
+                text('''
+                     UPDATE public.task
+                     SET task_status = NOT task_status
+                     WHERE task_id={task_id}; 
+                     '''.format(task_id=task_id)))
+
+            return '200'
+
+    except Exception:
+        return jsonify({"error": "Some error occured"})
+
+
+@cms.route('/task/add', methods=["POST"])
+def add_task():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    user_role = get_user_role()['rolname']
+
+    if user_role == "employee":
+        return jsonify({"error": "Forbidden"})
+
+    try:
+        representative = request.json["representative"]
+        executor = request.json["executor"]
+        contract = 'null' if request.json["contract"] == None else request.json["contract"]
+        priority = request.json["priority"]
+        title = request.json["title"]
+        to_date = request.json["to_date"]
+        task_status = request.json["task_status"]
+
+    except KeyError:
+        return jsonify({"error": "All fields must be filled"})
+
+    author = get_user_passport(user_login)
+
+    if user_role == "db_admin":
+        user_login = "db_admin"
+
+    validation = validate_input(
+        representative, executor, priority, title, to_date, author)
+    validatation_emp = validate_employee_id(executor)
+    validatation_rep = validate_rep_tin(representative)
+    to_date = to_date.replace('.', '-')
+
+    print(validation, validatation_emp, validatation_rep,
+          isinstance(task_status, bool))
+    if validation == "ALL_VALID" and validatation_emp == "ALL_VALID" and validatation_rep == "ALL_VALID" and isinstance(task_status, bool):
+        try:
+            with db.engine.connect() as connection:
+                res = connection.execute(
+                    text('''
+                            INSERT INTO public.task(
+                                task_type, due_date, task_status, contract, author, executor, company_representative, task_priority)
+                            VALUES ('{title}', '{due_date}', '{task_status}', {contract}, '{author}', '{executor}', '{company_representative}', B'{task_priority}');
+                        '''.format(login=user_login, title=title, due_date=to_date, task_status=task_status, contract=contract, author=author,
+                                   executor=executor, company_representative=representative, task_priority=priority)))
+                print("result ", dict(res))
+                return '200'
+
+        except Exception:
+            return jsonify({"error": 'Ivalid input'})
+
+    return jsonify({"error": "Invalid input"})

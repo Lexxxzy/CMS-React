@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import BreadCrumbs from '../Breadcrumbs/breadcrumbs.component'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import Card from './Card/card.component'
@@ -6,21 +6,23 @@ import './kanban.styles.sass'
 import cn from "classnames"
 import EditModal from '../EditModalUser/editUserModal.component'
 import { useDispatch, useSelector } from 'react-redux'
-import { getTasks } from '../../calls/cmsCalls'
+import { getTasks, updateTaskStatus } from '../../calls/cmsCalls'
 import Loader from '../Loader'
 import { swapTasks } from '../../data/tasksSlice'
 import AddTaskModal from './Modal/addTaskModal.component'
-
+import Snackbar, { SnackbarType } from '../Snackbar'
 const taskRows = ["Task title","Deadline","Representative","Executor","Contract","Priority"];
 
 function Kanban({ title }) {
   const dispatchAction = useDispatch();
   const { tasks, pending, error, errorText } = useSelector((state) => state.tasks)
+  const [errorAddTask, setErrorAddTask] = useState(false);
 
   useEffect(() => { 
     getTasks(dispatchAction);
    }, []);
 
+   const snackbarRef = useRef(null);
 
   const onDragEnd = result => {
     if(!result.destination) return
@@ -41,6 +43,7 @@ function Kanban({ title }) {
       const [removed] = sourceTask.splice(source.index,1)
       destinationTask.splice(destination.index,0,removed)
 
+      updateTaskStatus(result.draggableId)
 
       dispatchAction(swapTasks({
         sourceTasks: sourceTask,
@@ -95,7 +98,7 @@ function Kanban({ title }) {
                           <div className='overflow-y-auto h-[39.5rem] kanban__section__content'>
                             {section.tasks.map((task, index) => (
                                 <Draggable
-                                  key={task.id}
+                                  key={(task.id).toString()}
                                   draggableId={task.id}
                                   index={index}>
                                   {(provided, snapshot) => {
@@ -120,7 +123,7 @@ function Kanban({ title }) {
                               ))}
                           </div>
                           <div className='text-slate-500 underline '>
-                          <AddTaskModal fields={taskRows} options={["s","s"]} selectedRepresentative="sdsa" setRepresentative={() => "s"} title="Add taskk" buttonText="Add task"/>
+                          <AddTaskModal fields={taskRows} options={["s","s"]} selectedRepresentative="sdsa" setRepresentative={() => "s"} title="Add taskk" buttonText="Add task" snackbarRef={snackbarRef} setErrorAddTask={setErrorAddTask} errorAddTask={errorAddTask}/>
                           </div>
                           {provided.placeholder}
                         </div>
@@ -132,6 +135,18 @@ function Kanban({ title }) {
           </DragDropContext>
         </div>
       </div> : <Loader></Loader>}
+      {errorAddTask===false ?
+      <Snackbar
+      ref={snackbarRef}
+      message="Task was added"
+      type={SnackbarType.success}
+    /> :
+      <Snackbar
+      ref={snackbarRef}
+      message="Incorrect input"
+      type={SnackbarType.error}
+    />
+      }
     </div>
   )
 }

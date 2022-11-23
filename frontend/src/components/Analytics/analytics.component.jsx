@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { getAnalytics } from '../../calls/cmsCalls'
 import BreadCrumbs from '../Breadcrumbs/breadcrumbs.component'
 import Loader from '../Loader'
+import MiniEmployeeTable from './Employees/miniEmployeeTable'
 import OverallStats from './Overall/overallStats.component'
 import RecentTasks from './Recent/recentTasks.component'
 import TotalTasks from './Total/totalTasks.component'
@@ -43,6 +44,7 @@ export default function AnalyticsDashboard(props) {
                 <RecentTasks recentTasks={analytics.recent_tasks} setActiveTab={setActiveTab}/>
 
                 {/* TODO: Employees mini table */}
+                <MiniEmployeeTable title=""></MiniEmployeeTable>
             </div>
         </div> : <Loader></Loader>}
         </>

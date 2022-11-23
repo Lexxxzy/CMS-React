@@ -10,7 +10,7 @@ function Card({ task }) {
                 <h3 className='flex justify-items-left align-middle content-center leading-4'>
                     <span className='mt-4'>{title.slice(0, 20)} {title.length > 17 && "..."}</span>
                     <button className={cn("ml-3 mt-4 w-4 h-4 rounded-full bg-transparent border-4 border-solid  text-white",
-                        priority === "0" && "border-green-400", (priority === "1" || priority === "010") && "border-orange-400", priority === 2 && "border-red-500")} />
+                        priority === "0" && "border-green-400", (priority === "1" || priority === "010") && "border-orange-400", priority === "100" && "border-red-500")} />
                 </h3>
                 <div className='mt-1 pt-0'>
                     <span className='text-green-400/75 text-xs font-medium'>

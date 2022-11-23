@@ -166,3 +166,41 @@ def validate_documents(tin, passport_id):
         return "Invalid passport id value"
     
     return "ALL_VALID"
+
+
+def validate_employee_id(*args):
+    for value in args:
+        if not value.isdigit() and len(value)!=10:
+            return 'Invalid employee id'
+        
+        with db.engine.connect() as connection:
+            search_result = connection.execute(text('''
+                                                    SELECT login
+                                                    FROM public.employee 
+                                                    WHERE passport='{passport}';
+                                                    '''.format(passport=value)))
+            res = [dict(row) for row in search_result]
+            
+            if len(res) == 0:
+                return 'Invalid employee id' 
+        
+    return "ALL_VALID"
+    
+def validate_rep_tin(*args):
+    for value in args:
+        if not value.isdigit() and len(value)!=10:
+            return 'Invalid employee id'
+        
+        with db.engine.connect() as connection:
+            search_result = connection.execute(text('''
+                                                    SELECT tin
+                                                    FROM public.company_representative 
+                                                    WHERE tin='{tin}';
+                                                    '''.format(tin=value)))
+            res = [dict(row) for row in search_result]
+            
+            if len(res) == 0:
+                return 'Invalid representative id' 
+        
+    return "ALL_VALID"
+        

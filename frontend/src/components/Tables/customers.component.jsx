@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import EditModal from '../EditModalUser/editUserModal.component'
 import Table from '../Table/table.component'
 import cn from "classnames"
-import { getCustomers } from '../../calls/cmsCalls'
+import { getCustomers, server } from '../../calls/cmsCalls'
 import Loader from '../Loader'
 
 export default function CustomersTable(props) {
@@ -23,12 +23,20 @@ export default function CustomersTable(props) {
       const [pending, setPending] = useState(null);
       const [customers, setCustomers] = useState();
   
-      useEffect(() => {
-            getCustomers(setPending, setCustomers); 
-      }, [])
+    //   useEffect(() => {
+    //         getCustomers(setPending, setCustomers); 
+    //   }, [])
+
+    const [query, setQuery] = useState("");
+
+
+    useEffect(() => {
+
+        if (query.length === 0 || query.length > 1) getCustomers(setPending, setCustomers, query);
+    }, [query]);
 
     return (
-        <Table title={title}>
+        <Table title={title} query={setQuery}>
         {pending===false ?
             <table className="backdrop-blur-sm w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs font-normal text-light-gray uppercase">
