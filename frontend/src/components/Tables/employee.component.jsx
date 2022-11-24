@@ -59,7 +59,7 @@ export default function EmployeeTable(props) {
                                 <td className="py-4 px-6 font-medium text-gray-400">{info["passport"]}</td>
                                 <td className={`py-4 px-6 font-medium ${info["salary"]===null ? 'text-red-400' : 'text-green-400'}`}>{info["salary"]===null ? "Not set" : `₽${info["salary"]}`}</td>
                                 <td className="py-1 px-6">
-                                    <EditUserModal fields={Object.keys(info)} data={employees[index]} title={title}/>
+                                    <EditUserModal fields={Object.keys(info)} data={employees[index]} title={title} secondButton={true}/>
                                 </td>
                                 
                             </tr>

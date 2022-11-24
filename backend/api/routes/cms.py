@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app, session
+from flask import Blueprint, request, jsonify, current_app, session, send_file
 from helpers.validation import validate_account, check_mail, check_user_exists, validate_role, validate_rep_tin, validate_input, validate_employee_id
 from sqlalchemy import text
 from app.extensions import db
@@ -6,6 +6,7 @@ from helpers.checkers import get_available_tables
 from helpers.searchers import get_user_password, get_user_login, get_user_passport
 from routes.auth import get_user_role
 import re
+import os
 
 cms = Blueprint('cms', __name__, url_prefix="/cms")
 
@@ -36,26 +37,26 @@ def get_tasks():
     try:
         with db.engine.connect() as connection:
             all_tasks = connection.execute(text('''
-                                            SET ROLE {login};
-                                            SELECT 
-                                                t.task_id::varchar(10) AS id,
-                                                t.task_type AS title,
-                                                t.contract,
-                                                t.task_status,
-                                                t.task_priority AS priority,
-                                                TO_CHAR(t.creation_date, 'dd.mm.yyyy') AS from_date,
-                                                TO_CHAR(t.due_date, 'dd.mm.yyyy') AS to_date,
-                                                CONCAT(rep.surname, ' ', SUBSTRING(rep.name,1,1), '. ', SUBSTRING(rep.middle_name,1,1), '.') AS representative,
-                                                CONCAT(executor.surname, ' ', SUBSTRING(executor.name,1,1), '. ', SUBSTRING(executor.middle_name,1,1), '.') AS executor,
-                                                CONCAT(author.surname, ' ', SUBSTRING(author.name,1,1), '. ', SUBSTRING(author.middle_name,1,1), '.') AS author
-                                            FROM public.task t
-                                            JOIN public.employee author
-                                                ON t.author = author.passport
-                                            JOIN public.employee executor
-                                                ON t.executor = executor.passport
-                                            JOIN public.company_representative rep
-                                                ON t.company_representative = rep.tin;
-                                            '''.format(login=user_login)))
+            SET ROLE {login};
+            SELECT 
+                t.task_id::varchar(10) AS id,
+                t.task_type AS title,
+                t.contract,
+                t.task_status,
+                 t.task_priority AS priority,
+                TO_CHAR(t.creation_date, 'dd.mm.yyyy') AS from_date,
+                TO_CHAR(t.due_date, 'dd.mm.yyyy') AS to_date,
+                CONCAT(rep.surname, ' ', SUBSTRING(rep.name,1,1), '. ', SUBSTRING(rep.middle_name,1,1), '.') AS representative,
+                CONCAT(executor.surname, ' ', SUBSTRING(executor.name,1,1), '. ', SUBSTRING(executor.middle_name,1,1), '.') AS executor,
+                CONCAT(author.surname, ' ', SUBSTRING(author.name,1,1), '. ', SUBSTRING(author.middle_name,1,1), '.') AS author
+             FROM public.task t
+            JOIN public.employee author
+                 ON t.author = author.passport
+            JOIN public.employee executor
+                ON t.executor = executor.passport
+            JOIN public.company_representative rep
+                ON t.company_representative = rep.tin;
+            '''.format(login=user_login)))
 
             completed_tasks = []
             not_completed_tasks = []
@@ -103,7 +104,7 @@ def get_user_info():
                                                         CONCAT('₽', CAST(salary AS varchar)) AS salary,
                                                         age
                                                     FROM employee
-                                                    WHERE login='dh';
+                                                    WHERE login='{login}';
                                                     '''.format(login=user_login)))
 
             return jsonify([dict(row) for row in user_info])
@@ -261,18 +262,18 @@ def get_cutomers():
     try:
         with db.engine.connect() as connection:
             cutomers = connection.execute(text('''
-                                               SET ROLE {login};
-                                                SELECT 
-                                                    org.*, 
-                                                    postal.*, 
-                                                    CONCAT(rep.surname, ' ', SUBSTRING(rep.name,1,1), '. ', SUBSTRING(rep.middle_name,1,1), '.') AS representative
-                                                FROM organization org
-                                                JOIN postal_info postal 
-                                                ON postal.postal_info_id = org.postal_info_id
-                                                JOIN company_representative rep
-                                                ON rep.organization = org.tax_id_number
-                                                WHERE org.org_title ILIKE '%{query}%';
-                                                '''.format(login=user_login, query=customer)))
+SET ROLE {login};
+ SELECT 
+     org.*, 
+     postal.*, 
+     CONCAT(rep.surname, ' ', SUBSTRING(rep.name,1,1), '. ', SUBSTRING(rep.middle_name,1,1), '.') AS representative
+ FROM organization org
+ JOIN postal_info postal 
+ ON postal.postal_info_id = org.postal_info_id
+ JOIN company_representative rep
+ ON rep.organization = org.tax_id_number
+ WHERE org.org_title ILIKE '%{query}%';
+ '''.format(login=user_login, query=customer)))
             return jsonify([dict(row) for row in cutomers])
 
     except Exception:
@@ -409,8 +410,6 @@ def add_task():
     validatation_rep = validate_rep_tin(representative)
     to_date = to_date.replace('.', '-')
 
-    print(validation, validatation_emp, validatation_rep,
-          isinstance(task_status, bool))
     if validation == "ALL_VALID" and validatation_emp == "ALL_VALID" and validatation_rep == "ALL_VALID" and isinstance(task_status, bool):
         try:
             with db.engine.connect() as connection:
@@ -421,10 +420,37 @@ def add_task():
                             VALUES ('{title}', '{due_date}', '{task_status}', {contract}, '{author}', '{executor}', '{company_representative}', B'{task_priority}');
                         '''.format(login=user_login, title=title, due_date=to_date, task_status=task_status, contract=contract, author=author,
                                    executor=executor, company_representative=representative, task_priority=priority)))
-                print("result ", dict(res))
+                
                 return '200'
 
         except Exception:
             return jsonify({"error": 'Ivalid input'})
 
     return jsonify({"error": "Invalid input"})
+
+
+@cms.route('/report')
+def get_report():
+    user_login = session.get("user_id")
+
+    if not user_login:
+        return jsonify({"error": "Unauthorized"})
+
+    try:
+        from_date = request.args.get("from_date", default="", type=str)
+        to_date = request.args.get("to_date", default="", type=str)
+        passport = request.args.get("passport", default="", type=str)
+    except KeyError:
+        return {"error": "All fields must be filled"}
+
+    try:
+        with db.engine.connect() as connection:
+            report = connection.execute(
+                text('''
+                     SELECT * FROM get_report('{passport}', '{from_date}', '{to_date}');
+                     '''.format(from_date=from_date, to_date=to_date, passport=passport)))
+            
+            return jsonify([dict(row) for row in report][0])
+
+    except Exception:
+        return jsonify({"error": "Some error occured"}),500

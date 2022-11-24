@@ -135,3 +135,20 @@ export const logUserIn = async (email, password, dispatchAction, navigate) => {
       dispatchAction(getTablesError());
     }
   };
+
+  export const getUserRole = async (setUserRole) => {
+    try {
+      const resp = await server.get(`${serverIp}/@me/role`,);
+      console.log(resp.data.rolname)
+      if (resp.data.error != null) {
+        console.error(resp.data.error)
+      }
+  
+      else {
+        setUserRole(resp.data.rolname)
+      }
+    } catch (error) {
+      console.error(error);
+     
+    }
+  };

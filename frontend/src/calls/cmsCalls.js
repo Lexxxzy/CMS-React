@@ -220,3 +220,25 @@ export const updateTaskStatus = async (taskId) => {
     return false
   }
 };
+
+
+export const getReport = async (from_date,to_date,passport, setReport) => {
+  try {
+    const resp = await server.get(`${serverIp}/report`, 
+    { params: { "from_date": from_date, "to_date": to_date, "passport": passport } 
+  });
+
+    if (resp.data.error != null) {
+      console.error(resp.data.error)
+    }
+
+    else {
+      setReport(resp.data)
+    }
+  } catch (error) {
+    console.error(error);
+   
+  }
+};
+
+

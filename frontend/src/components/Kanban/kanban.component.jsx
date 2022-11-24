@@ -11,15 +11,18 @@ import Loader from '../Loader'
 import { swapTasks } from '../../data/tasksSlice'
 import AddTaskModal from './Modal/addTaskModal.component'
 import Snackbar, { SnackbarType } from '../Snackbar'
+import { getUserRole } from '../../calls/authCalls'
 const taskRows = ["Task title","Deadline","Representative","Executor","Contract","Priority"];
 
 function Kanban({ title }) {
   const dispatchAction = useDispatch();
   const { tasks, pending, error, errorText } = useSelector((state) => state.tasks)
   const [errorAddTask, setErrorAddTask] = useState(false);
-
+  const [userRole, setUserRole] = useState(null);
+  
   useEffect(() => { 
     getTasks(dispatchAction);
+    getUserRole(setUserRole);
    }, []);
 
    const snackbarRef = useRef(null);
@@ -123,7 +126,7 @@ function Kanban({ title }) {
                               ))}
                           </div>
                           <div className='text-slate-500 underline '>
-                          <AddTaskModal fields={taskRows} options={["s","s"]} selectedRepresentative="sdsa" setRepresentative={() => "s"} title="Add taskk" buttonText="Add task" snackbarRef={snackbarRef} setErrorAddTask={setErrorAddTask} errorAddTask={errorAddTask}/>
+                          {userRole!==null && userRole!=="employee" && <AddTaskModal fields={taskRows} options={["s","s"]} selectedRepresentative="sdsa" setRepresentative={() => "s"} title="Add taskk" buttonText="Add task" snackbarRef={snackbarRef} setErrorAddTask={setErrorAddTask} errorAddTask={errorAddTask}/>}
                           </div>
                           {provided.placeholder}
                         </div>

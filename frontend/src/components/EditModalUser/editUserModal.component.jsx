@@ -1,10 +1,11 @@
 import React, { useEffect} from 'react';
 import { Button, Modal } from 'flowbite-react';
 import OutsideClickHandler from "react-outside-click-handler";
+import ReportModal from '../ReportModal/reportModal.component';
     
 function EditModal(props) {
     const [visible, setVisible] = React.useState(false);
-    const { fields, data, title, buttonText="More Info" } = props
+    const { fields, data, title, secondButton=null, buttonText="More Info" } = props
 
     useEffect(() => {
         const firstField = document.querySelector("input[name=field-0]")
@@ -83,11 +84,14 @@ function EditModal(props) {
                             <Button onClick={() => setVisible(false)}>
                                 <div>Save all</div>
                             </Button>
-
+                                {secondButton===true &&
+                                    <ReportModal passport={data["passport"]}/>
+                           }
                         </Modal.Footer>
                     </div>
                 </div>
                 </OutsideClickHandler>
+                
             </Modal>
             
         </React.Fragment>
